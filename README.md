@@ -1,3 +1,3 @@
-# fullStackOpen2021 Submissions
+# fullStackOpen2022 Submissions
 
 
