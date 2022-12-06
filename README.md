@@ -1,5 +1,5 @@
-# fullStackOpen2022 Submissions
-part0: Completed
-part1: In Progress
+# fullStackOpen2022 Submissions 
+part0: Completed <br />
+part1: In Progress <br />
 
 
