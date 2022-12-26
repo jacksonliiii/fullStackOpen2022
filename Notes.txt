@@ -1,0 +1,5 @@
+To create a new react app use this command:
+
+npx create-react-app my-app
+cd my-app
+npm start
