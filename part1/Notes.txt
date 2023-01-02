@@ -1,0 +1,51 @@
+# To create a new react app use this command:
+
+npx create-react-app my-app
+cd my-app
+npm start
+
+-------------------------------------------------------------------------------------
+
+# Destructuring - extract prop into seperate values
+
+const Hello = (props) => {
+  const { name, age } = props
+  const bornYear = () => new Date().getFullYear() - age
+  ...
+
+# Can put destructuring right into parameter declaration 
+
+const Hello = ({ name, age }) => {
+  const bornYear = () => new Date().getFullYear() - age
+
+-------------------------------------------------------------------------------------
+
+# React State Hook
+- Hooks ONLY called from inside function body that defines the React component
+- NO conditionals, loops, etc.
+
+- event handler is assigned the returned value from the function
+
+""" WILL NOT WORK
+<button onClick={console.log('clicked the button')}>
+  button
+</button>
+"""
+
+""" WILL WORK
+<button onClick={() => console.log('clicked the button')}>
+  button
+</button>
+"""
+
+import { useState } from 'react'
+...
+const [ variable, setVariable ] = useState(0)
+
+-------------------------------------------------------------------------------------
+
+# DO NOT MUTATE REACT STATE DIRECTLY
+Eg. do not push elements into arrays, instead, use concat() to create a copy 
+of the new array with the added element
+
+# When debugging use console.log('props value is', props)
