@@ -1,8 +1,30 @@
+
 import { useState, useEffect } from 'react'
+import './App.css'
 import phonebookService from './services/persons'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
+
+const Notification = ({ message, success }) => {
+  if (message === null) {
+    return null
+  }
+
+  if (success) {
+    return (
+      <div className='successful'>
+        {message}
+      </div>
+    )
+  }
+  
+  return (
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
 
 const App = () => {
 
@@ -10,6 +32,8 @@ const App = () => {
   const [filter, setFilter] = useState('')
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [message, setMessage] = useState(null)
+  const [success, setSuccess] = useState(true)
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
@@ -47,13 +71,19 @@ const App = () => {
 
         phonebookService
         .updatePerson(personObject)
-        console.log(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+          setMessage(`Added ${returnedPerson.name}`)
+          setSuccess(true)
+          setTimeout(() => {setMessage(null)}, 5000)
         })
-        .catch(e => console.log(e))
+        .catch(error => {
+          setMessage(`Information of ${newName} has already been removed from server`)
+          setSuccess(false)
+          setTimeout(() => {setMessage(null)}, 5000)
+        })
       }
     } else {
       const personObject = createPersonObject()
@@ -64,6 +94,9 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+        setMessage(`Added ${returnedPerson.name}`)
+        setSuccess(true)
+        setTimeout(() => {setMessage(null)}, 5000)
       })
     }
   }
@@ -86,6 +119,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2> 
+      <Notification message={message} success={success}/>
       <Filter filter={filter} handleFilterChange={handleFilterChange}/>
 
       <h2>Add a New Entry</h2>
