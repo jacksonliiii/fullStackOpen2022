@@ -1,8 +1,16 @@
 
 const express = require('express')
+const morgan = require('morgan')
+
 const app = express()
 
+// Middleware for handling request and response objects
+// app.use(express.json())
+morgan.token('body', (req) => { return JSON.stringify(req.body) })
+
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+
 
 // Data
 let persons = [
@@ -61,25 +69,24 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (req, res) => {
     
-    const body = request.body // Data to POST is sent through body
-    console.log(body)
+    const body = req.body // Data to POST is sent through body
 
     if (!body.name) {
-        return response.status(400).json({ 
+        return res.status(400).json({ 
           error: 'Name missing' 
         })
     }
 
     if (persons.find(person => person.name === body.name)) {
-        return response.status(400).json({ 
+        return res.status(400).json({ 
             error: 'Name must be unique' 
           })
     }
 
     if (!body.number) {
-        return response.status(400).json({ 
+        return res.status(400).json({ 
           error: 'Number missing' 
         })
     }
@@ -91,7 +98,7 @@ app.post('/api/persons', (request, response) => {
     }
     
     persons = persons.concat(person)
-    response.json(person)
+    res.json(person)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -101,8 +108,6 @@ app.delete('/api/persons/:id', (request, response) => {
 
     response.status(204).end()
 })
-
-
 
 const PORT = 3001
 app.listen(PORT, () => {
