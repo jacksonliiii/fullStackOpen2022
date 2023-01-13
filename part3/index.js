@@ -65,7 +65,6 @@ app.post('/api/notes', (request, response) => {
   }
 
   notes = notes.concat(note)
-
   response.json(note)
 })
 
