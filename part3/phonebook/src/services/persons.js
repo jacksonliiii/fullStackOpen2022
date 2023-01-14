@@ -1,7 +1,6 @@
-// This module takes care of all HTTP Requests
 
 import axios from 'axios'
-const baseUrl = 'http://localhost:3001/api/persons'
+const baseUrl = '/api/persons'
 
 const getPersons = () => {
     const request = axios.get(baseUrl)

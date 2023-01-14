@@ -8,6 +8,7 @@ const app = express()
 // Middleware for handling request and response objects
 morgan.token('body', (req) => { return JSON.stringify(req.body) })
 
+app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
