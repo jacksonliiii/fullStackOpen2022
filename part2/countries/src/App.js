@@ -1,10 +1,12 @@
 import {useState, useEffect} from 'react'
 import axios from 'axios'
+import './App.css'
 
 const Filter = ({filter, handleFilterChange}) => {
   return (
     <form>
-      <div>Find Countries <input value={filter} onChange={handleFilterChange}/></div>
+      <div>Find Countries: <input className="filter" placeholder='eg. Canada' value={filter} onChange={handleFilterChange}/>
+      </div>
     </form>
   )
 }
@@ -31,8 +33,8 @@ const Weather = ({country}) => {
     })
 
   return (
-    <div>
-      <h2>Weather in {country.capital}</h2> 
+    <div className="more-info-weather">
+      <p>Weather in {country.capital}</p> 
       <p>Temperature: {temperature} Celsius</p>
       <img alt='Weather icon' src={'https://openweathermap.org/img/wn/' + icon + '@4x.png'}/>
       <p>Wind: {wind} m/s</p>
@@ -42,16 +44,20 @@ const Weather = ({country}) => {
 
 const CountryResult = ({country}) => {
   return (
+    <div className="more-info">
+      <div className="more-info-place">
+        <h1>{country.name.common}</h1>
+        <p>Capital: {country.capital}</p>
+        <p>Area: {country.area}</p>
+        <h2>Languages:</h2>
+        <ul>
+          {Object.values(country.languages).map(language => <li key={language}>{language}</li>)}
+        </ul>
+      </div>
     <div>
-      <h1>{country.name.common}</h1>
-      <p>Capital: {country.capital}</p>
-      <p>Area: {country.area}</p>
-      <h2>Languages:</h2>
-      <ul>
-        {Object.values(country.languages).map(language => <li key={language}>{language}</li>)}
-      </ul>
       <img alt="The respective country's flag" src={country.flags.png}/>
-      <Weather country={country}/>
+    </div>
+    <Weather country={country}/>
     </div>
   )
 }
@@ -59,8 +65,8 @@ const CountryResult = ({country}) => {
 const Country = ({country, single}) => {
 
   const [visible, setVisible] = useState(false)
+
   const onClick = () => {
-    console.log("Clicked!");
     setVisible(!visible)
   }
 
@@ -72,7 +78,7 @@ const Country = ({country, single}) => {
     return (
       <div>
         <p>{country.name.common}</p>
-        <input type="submit" value="Show" onClick={onClick}/>
+        <input type="submit" className="view-button" value={visible ? "Hide" : "Show"} onClick={onClick}/>
         {visible ? <CountryResult country={country}/> : null}
       </div>
     )
@@ -85,7 +91,9 @@ const Countries = ({countries, filter}) => {
 
   if (filtered.length > 10) {
     return (
-      <p>Too many matches, specify another filter</p>
+      <div>
+        <p className='alert'>Too many matches, please narrow down your search!</p>
+      </div>
     )
   } else if (filtered.length > 1) {
     return (
@@ -124,7 +132,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div className="main-container">
       <h1>Find Countries</h1>
       <Filter filter={filter} handleFilterChange={handleFilterChange}/>
       <Countries countries={countries} filter={filter}/>
