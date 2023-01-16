@@ -1,6 +1,6 @@
 
 import axios from 'axios'
-const baseUrl = 'http://localhost:3001/api/persons'
+const baseUrl = '/api/persons'
 
 const getPersons = () => {
     const request = axios.get(baseUrl)
@@ -17,10 +17,9 @@ const deletePerson = (objectID) => {
     return request.then(response => response.data)
 }
 
-const updatePerson = async (objectID, number) => {
+const updatePerson = (objectID, number) => {
     const request = axios.put(baseUrl + '/' + objectID + '/' + number)
-    const response = await request
-    return response.data
+    return request.then(response => response.data)
 }
 
 const phonebookService = {
