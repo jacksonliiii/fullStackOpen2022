@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from 'react'
-import './App.css'
 import phonebookService from './services/persons'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
+
+import './App.css'
 
 const Notification = ({ message, success }) => {
   if (message === null) {
@@ -59,25 +60,30 @@ const App = () => {
     return {
       name: newName,
       number: newNumber,
-      id: newName.name
     }
   }
 
   const addName = (event) => {
     event.preventDefault()
-    if (persons.find(person => person.name === newName) ) {
+
+    if ( newName === '' || newNumber === '') {
+      setMessage("Make sure to fill out form before clicking 'Add'!")
+      setSuccess(false)
+      setTimeout(() => {setMessage(null)}, 5000)
+      return
+    }
+
+    const existingPerson = persons.find(person => person.name === newName)
+    if (existingPerson) {
       if (window.confirm(`${newName} is already added to phonebook, replace old number with new one?`)) {
-        const personObject = createPersonObject()
 
         phonebookService
-        .updatePerson(personObject)
+        .updatePerson(existingPerson.id, newNumber)
         .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
+          setPersons(persons)
           setNewName('')
           setNewNumber('')
-          setMessage(`Added ${returnedPerson.name}`)
-          setSuccess(true)
-          setTimeout(() => {setMessage(null)}, 5000)
+          window.location.reload()
         })
         .catch(error => {
           setMessage(`Information of ${newName} has already been removed from server`)
@@ -102,7 +108,6 @@ const App = () => {
   }
 
   const deleteName = (objectID) => {
-    console.log("clicked")
     phonebookService
     .deletePerson(objectID)
     .then(returned => {
@@ -117,16 +122,18 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h2>Phonebook</h2> 
+    <div className='main-container'>
+      <h1>Phonebook</h1> 
       <Notification message={message} success={success}/>
       <Filter filter={filter} handleFilterChange={handleFilterChange}/>
 
       <h2>Add a New Entry</h2>
       <PersonForm addName={addName} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}/>
 
-      <h3>Numbers</h3>
-      <Persons persons={persons} filter={filter} deleteName={deleteName}/>
+      <h2>Numbers</h2>
+      <div>
+        <Persons persons={persons} filter={filter} deleteName={deleteName}/>
+      </div>
     </div>
   )
 }

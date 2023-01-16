@@ -10,18 +10,33 @@ body {
 p {
     font-weight: bold;
 }
-  
-code {
-    font-family: 'Courier New', monospace;
+
+.pn {
+    background-color: rgb(195, 207, 218);
+    border-radius: 2px;
 }
-  
-img {
-    margin: 20px;
-    background-color: white;
-    border: 2px solid;
-    border-color: rgb(162, 185, 207);
+
+.number-list {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 2px solid rgb(111, 137, 160);
     border-radius: 10px;
-    padding: 10px;
+    background-color: rgb(111, 137, 160);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.number-individual {
+    margin: 5px;
+    border: 2px solid rgb(111, 137, 160);
+    border-radius: 10px;
+    background-color: aliceblue;
+}
+
+.person-form {
+    display: flex;
+    flex-direction: column;
 }
 
 .main-container {
@@ -30,9 +45,27 @@ img {
     justify-content: center;
     background-color: rgb(200, 218, 233);
     border: 5px solid;
-    border-color: rgb(111, 137, 160);;
+    border-color: rgb(111, 137, 160);
     border-radius: 20px;
     padding: 10px;
+}
+
+.successful {
+    border: 3px solid green;
+    border-radius: 5px;
+    background-color: rgb(35, 189, 35);
+    margin: 10px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.error {
+    border: 3px solid red;
+    border-radius: 5px;
+    background-color: rgb(218, 79, 79);
+    margin: 10px;
+    padding: 10px;
+    font-weight: bold;
 }
 
 input {
@@ -40,4 +73,34 @@ input {
     padding: 5px;
     margin: 5px;
     border-radius: 5px;
+}
+
+.delete-button {
+    border-radius: 5px;
+    background-color: #db0f0f;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    opacity: 0.9;
+  }
+  
+.delete-button:hover {
+    background-color: #a11313;
+}
+
+.add-button {
+    border-radius: 5px;
+    background-color: #0fdb19;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    opacity: 0.9;
+  }
+  
+.add-button:hover {
+    background-color: #217725;
 }

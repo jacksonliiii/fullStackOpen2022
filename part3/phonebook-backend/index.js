@@ -71,27 +71,9 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (request, response) => {
     
-    const body = req.body // Data to POST is sent through body
-
-    if (!body.name) {
-        return res.status(400).json({ 
-          error: 'Name missing' 
-        })
-    }
-
-    if (persons.find(person => person.name === body.name)) {
-        return res.status(400).json({ 
-            error: 'Name must be unique' 
-          })
-    }
-
-    if (!body.number) {
-        return res.status(400).json({ 
-          error: 'Number missing' 
-        })
-    }
+    const body = request.body
 
     const person = {
         name: body.name,
@@ -100,11 +82,18 @@ app.post('/api/persons', (req, res) => {
     }
     
     persons = persons.concat(person)
-    res.json(person)
+    response.json(person)
+})
+
+app.put('/api/persons/:id/:number', (request, response) => {
+  
+  const id = Number(request.params.id)
+  const specifiedPerson = persons.find(person => person.id === id)
+  specifiedPerson['number'] = request.params.number
+  response.json(specifiedPerson)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    // What if the person to be deleted is not found?
     const id = Number(request.params.id)
     persons = persons.filter(person => person.id !== id)
 
