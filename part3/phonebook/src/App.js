@@ -76,9 +76,8 @@ const App = () => {
     const existingPerson = persons.find(person => person.name === newName)
     if (existingPerson) {
       if (window.confirm(`${newName} is already added to phonebook, replace old number with new one?`)) {
-
         phonebookService
-        .updatePerson(existingPerson.id, newNumber)
+        .updatePerson(existingPerson.id, newNumber, newName)
         .then(returnedPerson => {
           setPersons(persons)
           setNewName('')
