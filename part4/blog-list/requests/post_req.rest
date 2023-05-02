@@ -1,0 +1,20 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Just A Test",
+    "author": "wasabiiwooman",
+    "url": "testURL",
+    "likes": 12
+}
+
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Another Test",
+    "author": "wasabiiman",
+    "url": "https://www.youtube.com/",
+    "likes": 24
+}
