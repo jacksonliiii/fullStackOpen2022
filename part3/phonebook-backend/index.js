@@ -79,7 +79,7 @@ app.get('/api/persons/:id', (request, response) => {
       .catch((error) => next(error));
 });
 
-app.put('/api/persons/:id/:number/:name', (request, response) => {
+app.put('/api/persons/:id/:number/:name', (request, response, next) => {
   const person = {
     name: request.params.name,
     number: request.params.number,
@@ -98,7 +98,7 @@ app.put('/api/persons/:id/:number/:name', (request, response) => {
       .catch((error) => next(error));
 });
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
       .then((result) => {
         response.status(204).end();

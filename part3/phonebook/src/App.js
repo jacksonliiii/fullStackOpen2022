@@ -19,7 +19,7 @@ const Notification = ({ message, success }) => {
       </div>
     )
   }
-  
+
   return (
     <div className='error'>
       {message}
@@ -29,7 +29,7 @@ const Notification = ({ message, success }) => {
 
 const App = () => {
 
-  const [persons, setPersons] = useState([]) 
+  const [persons, setPersons] = useState([])
   const [filter, setFilter] = useState('')
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
@@ -50,10 +50,10 @@ const App = () => {
 
   useEffect(() => {
     phonebookService
-    .getPersons()
-    .then(initialPersons => {
-      setPersons(initialPersons)
-    })
+      .getPersons()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
   }, [])
 
   const createPersonObject = () => {
@@ -66,10 +66,10 @@ const App = () => {
   const addName = (event) => {
     event.preventDefault()
 
-    if ( newName === '' || newNumber === '') {
+    if (newName === '' || newNumber === '') {
       setMessage("Make sure to fill out form before clicking 'Add'!")
       setSuccess(false)
-      setTimeout(() => {setMessage(null)}, 5000)
+      setTimeout(() => { setMessage(null) }, 5000)
       return
     }
 
@@ -77,49 +77,54 @@ const App = () => {
     if (existingPerson) {
       if (window.confirm(`${newName} is already added to phonebook, replace old number with new one?`)) {
         phonebookService
-        .updatePerson(existingPerson.id, newNumber, newName)
-        .then(returnedPerson => {
-          setPersons(persons)
-          setNewName('')
-          setNewNumber('')
-          window.location.reload()
-        })
-        .catch(error => {
-          setMessage(`Information of ${newName} has already been removed from server`)
-          setSuccess(false)
-          setTimeout(() => {setMessage(null)}, 5000)
-        })
+          .updatePerson(existingPerson.id, newNumber, newName)
+          .then(returnedPerson => {
+            setPersons(persons)
+            setNewName('')
+            setNewNumber('')
+            window.location.reload()
+          })
+          .catch(error => {
+            if (error.response.data.error.includes('Validation')) {
+              setMessage(`The provided number of ${newNumber} is not in the correct format!`)
+            } else {
+              setMessage(`Information of ${newName} has already been removed from server!`)
+            }
+            setSuccess(false)
+            setTimeout(() => { setMessage(null) }, 5000)
+          })
       }
     } else {
       const personObject = createPersonObject()
 
       phonebookService
-      .createPerson(personObject)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewNumber('')
-        setMessage(`Added ${returnedPerson.name}`)
-        setSuccess(true)
-        setTimeout(() => {setMessage(null)}, 5000)
-      })
-      .catch(error => {
-        console.log(error.response.data.error)
-        setMessage(error)
-        setSuccess(false)
-        setTimeout(() => {setMessage(null)}, 5000)
-      })
+        .createPerson(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+          setMessage(`Added ${returnedPerson.name}`)
+          setSuccess(true)
+          setTimeout(() => { setMessage(null) }, 5000)
+        })
+        .catch(error => {
+          console.log(error.response.data.error)
+          setMessage(error.response.data.error)
+          setSuccess(false)
+          setTimeout(() => { setMessage(null) }, 5000)
+        })
     }
   }
 
   const deleteName = (objectID) => {
     phonebookService
-    .deletePerson(objectID)
-    .then(returned => {
-      console.log(returned)})
-    .catch(e => {
-      console.log(e)
-    })
+      .deletePerson(objectID)
+      .then(returned => {
+        console.log(returned)
+      })
+      .catch(e => {
+        console.log(e)
+      })
 
     if (window.confirm(`Do you want to delete person ${objectID}?`)) {
       setPersons(persons.filter(p => p.id !== objectID))
@@ -128,16 +133,16 @@ const App = () => {
 
   return (
     <div className='main-container'>
-      <h1>Phonebook</h1> 
-      <Notification message={message} success={success}/>
-      <Filter filter={filter} handleFilterChange={handleFilterChange}/>
+      <h1>Phonebook</h1>
+      <Notification message={message} success={success} />
+      <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
       <h2>Add a New Entry</h2>
-      <PersonForm addName={addName} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}/>
+      <PersonForm addName={addName} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
 
       <h2>Numbers</h2>
       <div>
-        <Persons persons={persons} filter={filter} deleteName={deleteName}/>
+        <Persons persons={persons} filter={filter} deleteName={deleteName} />
       </div>
     </div>
   )
