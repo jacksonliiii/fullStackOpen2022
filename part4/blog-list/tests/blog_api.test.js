@@ -1,3 +1,4 @@
+const { result } = require('lodash');
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 const { response } = require('../app');
@@ -27,7 +28,7 @@ describe('Initial Tests', () => {
   });
 });
 
-describe('Blog Property Tests', () => {
+describe('GET Request Tests', () => {
   test('unique indentifiers are named id', async () => {
     const response = await api.get('/api/blogs');
 
@@ -36,6 +37,38 @@ describe('Blog Property Tests', () => {
     });
   });
 
+  test('fetch blog by existing id', async () => {
+    const allInitialBlogs = await BlogHelper.blogsInDb()
+    const blogToView = allInitialBlogs[1]
+
+    const resultBlog = await api
+      .get(`/api/blogs/${blogToView.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(resultBlog.body).toEqual(blogToView)
+  });
+
+  test('fetch blog by non-existing id', async () => {
+    const validNonexistingId = await BlogHelper.nonExistingId()
+
+    await api
+      .get(`/api/blogs/${validNonexistingId}`)
+      .expect(404)
+
+  });
+
+  test('fetch blog by malformatted id', async () => {
+    const malformattedId = '12345'
+
+    await api
+      .get(`/api/blogs/${malformattedId}`)
+      .expect(400)
+  });
+
+});
+
+describe('POST Request Tests', () => {
   test('POST requests create a new blog post', async () => {
     const newBlog = {
       _id: '5a422a851b54a676234d17f7',
@@ -97,7 +130,56 @@ describe('Blog Property Tests', () => {
       .send(noUrlPropertyBlog)
       .expect(400);
   });
-});
+})
+
+describe('DELETE Request Tests', () => {
+  test('Delete existing blog', async () => {
+    const allInitialBlogs = await BlogHelper.blogsInDb()
+    const blogToDelete = allInitialBlogs[1]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const response = await api.get('/api/blogs');
+    expect(response.body).toHaveLength(BlogHelper.initialBlogs.length - 1);
+
+  })
+
+  test('Delete non-existing blog', async () => {
+    const nonExistingId = await BlogHelper.nonExistingId()
+
+    await api
+      .delete(`/api/blogs/${nonExistingId}`)
+      .expect(204)
+
+    const response = await api.get('/api/blogs');
+    expect(response.body).toHaveLength(BlogHelper.initialBlogs.length);
+  })
+})
+
+describe('PUT Request Tests', () => {
+  test('Update existing blog', async () => {
+
+    const allInitialBlogs = await BlogHelper.blogsInDb()
+    const blogToUpdate = allInitialBlogs[0]
+
+    const updatedBlog = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(
+        {
+          title: blogToUpdate.title,
+          author: blogToUpdate.author,
+          url: blogToUpdate.url,
+          likes: blogToUpdate.likes + 1,
+        }
+      )
+      .expect(200)
+
+    expect(updatedBlog.body.likes).toBe(blogToUpdate.likes + 1)
+  })
+})
+
 
 afterAll(async () => {
   await mongoose.connection.close();

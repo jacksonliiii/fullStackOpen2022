@@ -53,9 +53,14 @@ const initialBlogs = [
 
 // Save and remove a blog and return the removed blog's ID
 const nonExistingId = async () => {
-  const blog = new Blog({ title: 'placeholder' });
+  const blog = new Blog(
+    {
+      title: 'tobedeleted',
+      url: 'www.placeholder.com'
+    }
+  );
   await blog.save();
-  await blog.remove();
+  await blog.deleteOne({title: 'tobedeleted'});
 
   return blog._id.toString();
 };
