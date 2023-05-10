@@ -1,3 +1,13 @@
+/*
+* Middleware sits between the client and the server and
+* intercepts and processes requests and responses. This adds
+* functionality to the application such as handling authentication,
+* logging, error handling and parsing reuqest bodies.
+* 
+* By brekaing down application logic into smaller and reusable 
+* middleware functions, code becomes more maintable and scalable
+*/
+
 const logger = require('./logger');
 
 const requestLogger = (request, response, next) => {
@@ -7,6 +17,16 @@ const requestLogger = (request, response, next) => {
   logger.info('---');
   next();
 };
+
+const tokenExtractor = (request, response, next) => {
+  const authorization = request.get('Authorization');
+  if (authorization && authorization.startsWith('Bearer ')) {
+    logger.info('Extracting token...');
+    request.token = authorization.replace('Bearer ', '');
+  }
+  
+  next();
+}
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' });
@@ -27,4 +47,4 @@ const errorHandler = (error, request, response, next) => {
   };
 };
 
-module.exports = { requestLogger, unknownEndpoint, errorHandler };
+module.exports = { requestLogger, tokenExtractor, unknownEndpoint, errorHandler };

@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   // TODO: Check username length, permitted characters, password strength
   username: {
     type: String,
+    minLength: [3, '`username` has to be atleast 3 characters long'],
     required: true,
     unique: true,
   },

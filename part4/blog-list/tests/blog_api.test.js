@@ -1,7 +1,6 @@
-const { result } = require('lodash');
+
 const mongoose = require('mongoose');
 const supertest = require('supertest');
-const { response } = require('../app');
 const app = require('../app');
 
 const api = supertest(app);

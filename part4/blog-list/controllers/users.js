@@ -9,7 +9,6 @@ const User = require('../models/user');
 *    "name": "Superuser",
 *    "password": "salainen"
 * } 
-*
 */
 
 usersRouter.get('/', async (request, response) => {
@@ -28,6 +27,13 @@ usersRouter.get('/', async (request, response) => {
 
 usersRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body;
+
+  if (password === '') {
+    response.status(400).send({error: 'Please fill in the `password` field'});
+  }
+  if (password.length < 3) {
+    response.status(400).send({error: '`password` has to be at least 3 characters long'});
+  }
 
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash(password, saltRounds);
