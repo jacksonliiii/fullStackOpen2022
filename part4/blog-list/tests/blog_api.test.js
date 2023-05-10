@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
@@ -66,6 +65,9 @@ describe('GET Request Tests', () => {
 });
 
 describe('POST Request Tests', () => {
+  //  TODO:
+  //  Add a before each block to create a user, login and
+  //  then start the POST request tests
   test('POST requests create a new blog post', async () => {
     const newBlog = {
       _id: '5a422a851b54a676234d17f7',

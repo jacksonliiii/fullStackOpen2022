@@ -1,12 +1,11 @@
-
 const mongoose = require('mongoose');
 const supertest = require('supertest');
-const app = require('../app');
-
-const api = supertest(app);
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const helper = require('./test_helper');
+const app = require('../app');
+
+const api = supertest(app);
 
 describe('when there is initially one user in db', () => {
   beforeEach(async () => {
@@ -17,8 +16,8 @@ describe('when there is initially one user in db', () => {
       {
         username: 'root',
         passwordHash,
-        name: 'rootbeer'
-      }
+        name: 'rootbeer',
+      },
     );
 
     await user.save();

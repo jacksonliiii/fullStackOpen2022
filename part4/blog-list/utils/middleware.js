@@ -3,8 +3,8 @@
 * intercepts and processes requests and responses. This adds
 * functionality to the application such as handling authentication,
 * logging, error handling and parsing reuqest bodies.
-* 
-* By brekaing down application logic into smaller and reusable 
+*
+* By brekaing down application logic into smaller and reusable
 * middleware functions, code becomes more maintable and scalable
 */
 
@@ -21,16 +21,19 @@ const requestLogger = (request, response, next) => {
 const tokenExtractor = (request, response, next) => {
   const authorization = request.get('Authorization');
   if (authorization && authorization.startsWith('Bearer ')) {
-    logger.info('Extracting token...');
+    logger.info('Extracting token');
     request.token = authorization.replace('Bearer ', '');
   }
+
+  next();
+};
+
+const userExtractor = (request, response, next) => {
   
   next();
 }
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' });
-};
+const unknownEndpoint = (request, response) => response.status(404).send({ error: 'unknown endpoint' });
 
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message);
@@ -41,10 +44,12 @@ const errorHandler = (error, request, response, next) => {
     case 'ValidationError':
       return response.status(400).json({ error: error.message });
     case 'JsonWebTokenError':
-      return response.status(400).json({ error: error.message })
+      return response.status(400).json({ error: error.message });
     default:
       next(error);
-  };
+  }
 };
 
-module.exports = { requestLogger, tokenExtractor, unknownEndpoint, errorHandler };
+module.exports = {
+  requestLogger, tokenExtractor, userExtractor, unknownEndpoint, errorHandler,
+};
