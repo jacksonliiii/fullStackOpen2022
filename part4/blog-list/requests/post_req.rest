@@ -18,3 +18,13 @@ Content-Type: application/json
     "url": "https://www.youtube.com/",
     "likes": 24
 }
+
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+    "username": "bigman",
+    "password": "123456",
+    "name": "James"
+}

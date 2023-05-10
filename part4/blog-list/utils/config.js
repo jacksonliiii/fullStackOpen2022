@@ -1,5 +1,5 @@
 /*
-*   Handling of environment variables
+*   Handling of environment variables via dotenv
 */
 
 require('dotenv').config();
