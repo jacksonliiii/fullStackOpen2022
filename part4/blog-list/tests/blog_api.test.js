@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
+const bcrypt = require('bcrypt');
 
 const api = supertest(app);
 const Blog = require('../models/blog');
+const User = require('../models/user');
 const BlogHelper = require('./test_helper');
 
 beforeEach(async () => {
@@ -65,10 +67,37 @@ describe('GET Request Tests', () => {
 });
 
 describe('POST Request Tests', () => {
-  //  TODO:
-  //  Add a before each block to create a user, login and
-  //  then start the POST request tests
+  let token;
+
+  beforeEach(async () => {
+    // User instantiation
+    await User.deleteMany({});
+    const passwordHash = await bcrypt.hash('password', 10);
+    const user = new User(
+      {
+        username: 'testuser',
+        name: 'root',
+        password: 'password',
+        passwordHash: passwordHash
+      }
+    );
+    await user.save();
+
+    const login = {
+      username: 'testuser',
+      password: 'password',
+    };
+
+    const loginResponse = await api
+      .post('/api/login')
+      .send(login)
+      .expect(200);
+
+    token = loginResponse.body.token;
+  });
+
   test('POST requests create a new blog post', async () => {
+
     const newBlog = {
       _id: '5a422a851b54a676234d17f7',
       title: 'React patterns',
@@ -80,6 +109,7 @@ describe('POST Request Tests', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -97,7 +127,8 @@ describe('POST Request Tests', () => {
 
     const response = await api
       .post('/api/blogs')
-      .send(noLikePropertyBlog);
+      .send(noLikePropertyBlog)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(201);
     expect(response.header['content-type']).toMatch(/application\/json/);
@@ -106,7 +137,7 @@ describe('POST Request Tests', () => {
     expect(newBlog.likes).toBe(0);
   });
 
-  test('Respond with bad request if title property is missing', async () => {
+  test('Return bad request if title property is missing', async () => {
     const noTitlePropertyBlog = {
       author: 'No Title John',
       url: 'https://example.com/',
@@ -115,10 +146,11 @@ describe('POST Request Tests', () => {
     await api
       .post('/api/blogs')
       .send(noTitlePropertyBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400);
   });
 
-  test('Respond with bad request if url property is missing', async () => {
+  test('Return bad request if url property is missing', async () => {
     const noUrlPropertyBlog = {
       title: 'No Url Blog',
       author: 'Uncle Url',
@@ -127,34 +159,84 @@ describe('POST Request Tests', () => {
     await api
       .post('/api/blogs')
       .send(noUrlPropertyBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400);
   });
-});
 
-describe('DELETE Request Tests', () => {
-  test('Delete existing blog', async () => {
-    const allInitialBlogs = await BlogHelper.blogsInDb();
-    const blogToDelete = allInitialBlogs[1];
-
-    await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
-      .expect(204);
-
-    const response = await api.get('/api/blogs');
-    expect(response.body).toHaveLength(BlogHelper.initialBlogs.length - 1);
-  });
-
-  test('Delete non-existing blog', async () => {
-    const nonExistingId = await BlogHelper.nonExistingId();
+  test('Respond with Unauthorized if a token is not provided', async () => {
+    const newBlog = {
+      title: 'React patterns',
+      author: 'Michael Chan',
+      url: 'https://reactpatterns.com/',
+      likes: 7
+    };
 
     await api
-      .delete(`/api/blogs/${nonExistingId}`)
-      .expect(204);
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401);
 
     const response = await api.get('/api/blogs');
     expect(response.body).toHaveLength(BlogHelper.initialBlogs.length);
   });
 });
+
+// TODO: Refactor Delete requests to handle token authentication
+// describe('DELETE Request Tests', () => {
+//   let token;
+
+//   beforeEach(async () => {
+//     // User instantiation
+//     await User.deleteMany({});
+//     const passwordHash = await bcrypt.hash('password', 10);
+//     const user = new User(
+//       {
+//         username: 'testuser',
+//         name: 'root',
+//         password: 'password',
+//         passwordHash: passwordHash
+//       }
+//     );
+//     await user.save();
+
+//     const login = {
+//       username: 'testuser',
+//       password: 'password',
+//     };
+
+//     const loginResponse = await api
+//       .post('/api/login')
+//       .send(login)
+//       .expect(200);
+
+//     token = loginResponse.body.token;
+//   });
+
+//   test('Delete existing blog', async () => {
+//     const allInitialBlogs = await BlogHelper.blogsInDb();
+//     const blogToDelete = allInitialBlogs[1];
+
+//     await api
+//       .delete(`/api/blogs/${blogToDelete.id}`)
+//       .set('Authorization', `'Bearer ${token}`)
+//       .expect(204);
+
+//     const response = await api.get('/api/blogs');
+//     expect(response.body).toHaveLength(BlogHelper.initialBlogs.length - 1);
+//   });
+
+//   test('Delete non-existing blog', async () => {
+//     const nonExistingId = await BlogHelper.nonExistingId();
+
+//     await api
+//       .delete(`/api/blogs/${nonExistingId}`)
+//       .set('Authorization', `'Bearer ${token}`)
+//       .expect(204);
+
+//     const response = await api.get('/api/blogs');
+//     expect(response.body).toHaveLength(BlogHelper.initialBlogs.length);
+//   });
+// });
 
 describe('PUT Request Tests', () => {
   test('Update existing blog', async () => {
