@@ -18,7 +18,7 @@ Content-Type: application/json
 ###
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJpZ2dlc3RtYW4iLCJpZCI6IjY0NWMwOWE1ZDU5MzYyZDA2MWIwYTZmNSIsImlhdCI6MTY4Mzc1MzU1NX0.UlcXJWTithVXf1owQOa5jTcrirevsXl1JTWQCW1pON8
+Authorization: Bearer ***
 
 {
     "title": "More Tests",
