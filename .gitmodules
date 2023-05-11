@@ -1,0 +1,4 @@
+[submodule "part4/blog-list/part4/part3-notes-backend"]
+	path = part4/blog-list/part4/part3-notes-backend
+	url = git@github.com:fullstack-hy2020/part3-notes-backend.git
+	branch = part4-5
