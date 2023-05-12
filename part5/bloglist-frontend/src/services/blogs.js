@@ -21,6 +21,11 @@ const create = async newObject => {
   return response.data
 }
 
+// const remove = id => {
+//   const response = axios.delete(`${ baseUrl }/${id}`)
+//   return response.then(response => response.data)
+// }
+
 const update = (id, newObject) => {
   const request = axios.put(`${ baseUrl }/${id}`, newObject)
   return request.then(response => response.data)
