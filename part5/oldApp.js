@@ -18,15 +18,15 @@ const App = () => {
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
 
-  const [info, setInfo] = useState({message: null})
+  const [info, setInfo] = useState({ message: null })
 
-  const notifyWith = (message, type='info') => {
+  const notifyWith = (message, type = 'info') => {
     setInfo({
       message, type
     })
 
     setTimeout(() => {
-      setInfo({ message: null} )
+      setInfo({ message: null })
     }, 3000)
   }
 
@@ -47,7 +47,7 @@ const App = () => {
 
   const resetForm = () => {
     setNewTitle('')
-    setNewAuthor('') 
+    setNewAuthor('')
     setNewUrl('')
   }
 
@@ -102,64 +102,45 @@ const App = () => {
     }
   }
 
-  const loginForm = () => (
-    <div>
-      <h1>Log in to BlogList</h1>
-      <form onSubmit={handleLogin}>
-        <div>
-          Username
-          <input
-            type="text"
-            value={username}
-            name="username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-
-        <div>
-          Password
-          <input
-            type="text"
-            value={password}
-            name="password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-
-  )
-
-  const blogPage = () => (
-    <div>
-      <h2>My Blogs</h2>
-      <div>
-        <h3>{user.username} logged in</h3>
-        <button onClick={handleLogout}>Logout</button>
-        <BlogForm
-          addBlog={addBlog}
-          newTitle={newTitle}
-          newAuthor={newAuthor}
-          newUrl={newUrl}
-          setNewTitle={setNewTitle}
-          setNewAuthor={setNewAuthor}
-          setNewURL={setNewUrl}
-        />
-      </div>
-      {
-        blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )
-      }
-    </div>
-  )
-
   return (
     <div>
-      <Notification info={info}/>
-      {user === null && loginForm()}
-      {user !== null && blogPage()}
+      <h1>Bloglist</h1>
+      <Notification info={info} />
+
+      {!user &&
+        <Togglable buttonLabel='Login'>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+        </Togglable>
+      }
+
+      {user &&
+        <div>
+          <h3>{user.username} logged in</h3>
+          <button onClick={handleLogout}>Logout</button>
+          <Togglable buttonLabel='New Blog'>
+            <BlogForm
+              addBlog={addBlog}
+              newTitle={newTitle}
+              newAuthor={newAuthor}
+              newUrl={newUrl}
+              setNewTitle={setNewTitle}
+              setNewAuthor={setNewAuthor}
+              setNewURL={setNewUrl}
+            />
+          </Togglable>
+          {
+            blogs.map(blog =>
+              <Blog key={blog.id} blog={blog} />
+            )
+          }
+        </div>
+      }
     </div>
   )
 }
