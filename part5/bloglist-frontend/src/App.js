@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
@@ -18,6 +18,8 @@ const App = () => {
   const [newUrl, setNewUrl] = useState('')
 
   const [info, setInfo] = useState({ message: null })
+
+  const blogFormRef = useRef()
 
   const notifyWith = (message, type = 'info') => {
     setInfo({
@@ -58,6 +60,7 @@ const App = () => {
       author: newAuthor,
       url: newUrl
     }).then(createdBlog => {
+      blogFormRef.current.toggleVisibility()
       notifyWith(`A new blog '${createdBlog.title}' by ${createdBlog.author} was added.`)
       setBlogs(blogs.concat(createdBlog))
       resetForm()
@@ -160,7 +163,7 @@ const App = () => {
       <div>
         <h3>{user.username} logged in</h3>
         <button onClick={handleLogout}>Logout</button>
-        <Togglable buttonLabel='Add a new Blog'>
+        <Togglable buttonLabel='Add a new Blog' ref={blogFormRef}>
           <BlogForm
             addBlog={addBlog}
             newTitle={newTitle}
@@ -176,7 +179,13 @@ const App = () => {
         blogs
           .sort((blogA, blogB) => blogB.likes - blogA.likes)
           .map(blog =>
-            <Blog key={blog.id} blog={blog} handleLike={handleLike} removeBlog={removeBlog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              currUser={user}
+              handleLike={handleLike}
+              removeBlog={removeBlog}
+            />
           )
       }
     </div>

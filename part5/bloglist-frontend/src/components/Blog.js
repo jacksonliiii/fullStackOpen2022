@@ -1,11 +1,11 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, handleLike, removeBlog }) => {
+const Blog = ({ blog, currUser, handleLike, removeBlog }) => {
   const [moreInfo, setMoreInfo] = useState(false)
   const hideInfoWhenVisible = { display: moreInfo ? 'none' : '' }
   const showInfoWhenVisible = { display: moreInfo ? '' : 'none' }
-  
-  const showToAddedUser = { display: blog.user.name ? '' : 'none'}
+
+  const showToAddedUser = { display: (currUser.username === blog.user.username) ? '' : 'none' }
 
   const toggleInfo = () => {
     setMoreInfo(!moreInfo)
