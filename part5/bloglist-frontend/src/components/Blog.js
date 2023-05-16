@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PropTypes } from 'prop-types'
 
 const Blog = ({ blog, currUser, handleLike, removeBlog }) => {
   const [moreInfo, setMoreInfo] = useState(false)
@@ -37,7 +36,5 @@ const Blog = ({ blog, currUser, handleLike, removeBlog }) => {
     </div>
   )
 }
-
-Blog.displayName = 'Blog'
 
 export default Blog

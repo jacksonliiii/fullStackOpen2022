@@ -2,6 +2,7 @@ node_modules
 fly.toml
 Dockerfile
 .dockerignore
-build/
+.eslintignore
 .env
+build/
 requests/

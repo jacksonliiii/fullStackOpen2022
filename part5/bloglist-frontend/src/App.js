@@ -73,7 +73,7 @@ const App = () => {
       blogService
         .remove(blog.id)
         .then(response => {
-          notifyWith(`Blog '${blog.title}' was removed.`)
+          notifyWith(`Blog '${response.title}' was removed.`)
           setBlogs(blogs.filter(currBlog => currBlog.id !== blog.id))
         })
         .catch(error => {
