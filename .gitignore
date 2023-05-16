@@ -4,4 +4,4 @@ Dockerfile
 .dockerignore
 build/
 .env
-.rest
+requests/

@@ -49,18 +49,22 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   response.status(201).json(createdBlog)
 })
 
-blogsRouter.put('/:id', async (request, response, next) => {
+blogsRouter.put('/:id', (request, response, next) => {
   const { title, author, url, likes, user } = request.body
 
-  const blog = new Blog({
+  const blog = {
     title,
     author,
     url,
-    user,
+    user: user.id,
     likes
-  })
+  }
 
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+  Blog.findByIdAndUpdate(
+    request.params.id,
+    blog,
+    { new: true }
+  )
     .then((updatedBlog) => {
       response.json(updatedBlog);
     })
@@ -68,16 +72,30 @@ blogsRouter.put('/:id', async (request, response, next) => {
 
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id);
-  const { user } = request;
-
-  if (blog.user.toString() === user.id.toString()) {
-    await Blog.findByIdAndDelete(request.params.id);
-    return response.status(204).end();
-  }
-  return response.status(400).json({ error: 'invalid user' });
+blogsRouter.delete('/:id', (request, response, next) => {
+  Blog
+    .findByIdAndDelete(request.params.id)
+    .then((result) => {
+      response.status(204).end();
+      console.log(result.title, 'was removed from the phonebook');
+    })
+    .catch((error) => next(error));
 });
+
+/*
+* This delete request was for user validation. 
+* No longer needed since frontend handles user validation.
+*/
+// blogsRouter.delete('/:id', async (request, response) => {
+//   const blog = await Blog.findById(request.params.id);
+//   const { user } = request;
+
+//   if (blog.user.toString() === user.id.toString()) {
+//     await Blog.findByIdAndDelete(request.params.id);
+//     return response.status(204).end();
+//   }
+//   return response.status(400).json({ error: 'invalid user' });
+// });
 
 // blogsRouter.put('/:id', (request, response, next) => {
 //   const { body } = request;

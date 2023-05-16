@@ -1,24 +1,11 @@
 import { useState } from 'react'
-import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike, removeBlog }) => {
   const [moreInfo, setMoreInfo] = useState(false)
   const hideInfoWhenVisible = { display: moreInfo ? 'none' : '' }
   const showInfoWhenVisible = { display: moreInfo ? '' : 'none' }
-
-  const handleLike = (event) => {
-    event.preventDefault()
-
-    blogService.update({
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blog.likes + 1,
-      user: blog.user
-    }).then((updatedBlog => {
-      console.log(updatedBlog);
-    }))
-  }
+  
+  const showToAddedUser = { display: blog.user.name ? '' : 'none'}
 
   const toggleInfo = () => {
     setMoreInfo(!moreInfo)
@@ -42,8 +29,9 @@ const Blog = ({ blog }) => {
       <div style={showInfoWhenVisible}>
         <p>{blog.title} {blog.author} <button onClick={toggleInfo}>Hide</button></p>
         <p>{blog.url}</p>
-        <p>{`Likes: ${blog.likes}`} <button onClick={handleLike}>Like</button></p>
+        <p>{`Likes: ${blog.likes}`} <button onClick={() => handleLike(blog)}>Like</button></p>
         <p>{blog.user.name}</p>
+        <button style={showToAddedUser} onClick={() => removeBlog(blog)}>Remove</button>
       </div>
     </div>
   )

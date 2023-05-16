@@ -64,6 +64,31 @@ const App = () => {
     })
   }
 
+  const removeBlog = (blog) => {
+
+    if (window.confirm(`Do you want to remove blog ${blog.title}?`)) {
+      blogService
+        .remove(blog.id)
+        .then(response => {
+          notifyWith(`Blog '${blog.title}' was removed.`)
+          setBlogs(blogs.filter(currBlog => currBlog.id !== blog.id))
+        })
+        .catch(error => {
+          notifyWith(`${error}`, 'error')
+        })
+    }
+  }
+
+  const handleLike = async (blog) => {
+    try {
+      const updatedBlog = { ...blog, likes: blog.likes + 1 }
+      await blogService.update(blog.id, updatedBlog)
+      setBlogs(blogs.map((currBlog) => (currBlog.id === blog.id ? updatedBlog : currBlog)))
+    } catch (error) {
+      notifyWith(`${error}`, 'error')
+    }
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -148,9 +173,11 @@ const App = () => {
         </Togglable>
       </div>
       {
-        blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )
+        blogs
+          .sort((blogA, blogB) => blogB.likes - blogA.likes)
+          .map(blog =>
+            <Blog key={blog.id} blog={blog} handleLike={handleLike} removeBlog={removeBlog} />
+          )
       }
     </div>
   )
