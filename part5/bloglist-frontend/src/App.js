@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
-import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
@@ -18,15 +17,15 @@ const App = () => {
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
 
-  const [info, setInfo] = useState({message: null})
+  const [info, setInfo] = useState({ message: null })
 
-  const notifyWith = (message, type='info') => {
+  const notifyWith = (message, type = 'info') => {
     setInfo({
       message, type
     })
 
     setTimeout(() => {
-      setInfo({ message: null} )
+      setInfo({ message: null })
     }, 3000)
   }
 
@@ -47,7 +46,7 @@ const App = () => {
 
   const resetForm = () => {
     setNewTitle('')
-    setNewAuthor('') 
+    setNewAuthor('')
     setNewUrl('')
   }
 
@@ -59,11 +58,10 @@ const App = () => {
       author: newAuthor,
       url: newUrl
     }).then(createdBlog => {
-      notifyWith(`A new blog '${createdBlog.title}' by ${createdBlog.author} was Added.`)
+      notifyWith(`A new blog '${createdBlog.title}' by ${createdBlog.author} was added.`)
       setBlogs(blogs.concat(createdBlog))
+      resetForm()
     })
-
-    resetForm()
   }
 
   const handleLogin = async (event) => {
@@ -137,15 +135,17 @@ const App = () => {
       <div>
         <h3>{user.username} logged in</h3>
         <button onClick={handleLogout}>Logout</button>
-        <BlogForm
-          addBlog={addBlog}
-          newTitle={newTitle}
-          newAuthor={newAuthor}
-          newUrl={newUrl}
-          setNewTitle={setNewTitle}
-          setNewAuthor={setNewAuthor}
-          setNewURL={setNewUrl}
-        />
+        <Togglable buttonLabel='Add a new Blog'>
+          <BlogForm
+            addBlog={addBlog}
+            newTitle={newTitle}
+            newAuthor={newAuthor}
+            newUrl={newUrl}
+            setNewTitle={setNewTitle}
+            setNewAuthor={setNewAuthor}
+            setNewUrl={setNewUrl}
+          />
+        </Togglable>
       </div>
       {
         blogs.map(blog =>
@@ -157,7 +157,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification info={info}/>
+      <Notification info={info} />
       {user === null && loginForm()}
       {user !== null && blogPage()}
     </div>

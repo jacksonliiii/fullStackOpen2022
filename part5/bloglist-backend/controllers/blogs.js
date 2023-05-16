@@ -11,7 +11,7 @@ const { userExtractor } = require('../utils/middleware');
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
-    .populate('user', { username: 1, name: 1 });
+    .populate('user', { username: 1, name: 1, id: 1 });
 
   return response.json(blogs);
 });
@@ -27,25 +27,45 @@ blogsRouter.get('/:id', async (request, response) => {
 
 blogsRouter.post('/', userExtractor, async (request, response) => {
   const { title, author, url, likes } = request.body
-  const blog = new Blog({
-    title, author, url,
-    likes: likes ? likes : 0
-  })
-
   const user = request.user
 
   if (!user) {
     return response.status(401).json({ error: 'operation not permitted' })
   }
 
-  blog.user = user._id
+  const blog = new Blog({
+    title,
+    author,
+    url,
+    likes: likes ? likes : 0,
+    user: user.id
+  })
 
   const createdBlog = await blog.save()
+  await blog.populate('user', { username: 1, name: 1, id: 1 })
 
   user.blogs = user.blogs.concat(createdBlog._id)
   await user.save()
-
   response.status(201).json(createdBlog)
+})
+
+blogsRouter.put('/:id', async (request, response, next) => {
+  const { title, author, url, likes, user } = request.body
+
+  const blog = new Blog({
+    title,
+    author,
+    url,
+    user,
+    likes
+  })
+
+  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    .then((updatedBlog) => {
+      response.json(updatedBlog);
+    })
+    .catch((error) => next(error));
+
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
@@ -59,21 +79,21 @@ blogsRouter.delete('/:id', async (request, response) => {
   return response.status(400).json({ error: 'invalid user' });
 });
 
-blogsRouter.put('/:id', (request, response, next) => {
-  const { body } = request;
+// blogsRouter.put('/:id', (request, response, next) => {
+//   const { body } = request;
 
-  const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes,
-  };
+//   const blog = {
+//     title: body.title,
+//     author: body.author,
+//     url: body.url,
+//     likes: body.likes,
+//   };
 
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    .then((updatedBlog) => {
-      response.json(updatedBlog);
-    })
-    .catch((error) => next(error));
-});
+//   Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+//     .then((updatedBlog) => {
+//       response.json(updatedBlog);
+//     })
+//     .catch((error) => next(error));
+// });
 
 module.exports = blogsRouter;
