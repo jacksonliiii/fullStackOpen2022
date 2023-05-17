@@ -13,10 +13,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
-
   const [info, setInfo] = useState({ message: null })
 
   const blogFormRef = useRef()
@@ -46,29 +42,17 @@ const App = () => {
     }
   }, [])
 
-  const resetForm = () => {
-    setNewTitle('')
-    setNewAuthor('')
-    setNewUrl('')
-  }
-
-  const addBlog = (event) => {
-    event.preventDefault()
-
-    blogService.create({
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }).then(createdBlog => {
-      blogFormRef.current.toggleVisibility()
-      notifyWith(`A new blog '${createdBlog.title}' by ${createdBlog.author} was added.`)
-      setBlogs(blogs.concat(createdBlog))
-      resetForm()
-    })
+  const addBlog = (blogObject) => {
+    blogService
+      .create(blogObject)
+      .then(createdBlog => {
+        blogFormRef.current.toggleVisibility()
+        notifyWith(`A new blog '${createdBlog.title}' by ${createdBlog.author} was added.`)
+        setBlogs(blogs.concat(createdBlog))
+      })
   }
 
   const removeBlog = (blog) => {
-
     if (window.confirm(`Do you want to remove blog ${blog.title}?`)) {
       blogService
         .remove(blog.id)
@@ -165,13 +149,7 @@ const App = () => {
         <button onClick={handleLogout}>Logout</button>
         <Togglable buttonLabel='Add a new Blog' ref={blogFormRef}>
           <BlogForm
-            addBlog={addBlog}
-            newTitle={newTitle}
-            newAuthor={newAuthor}
-            newUrl={newUrl}
-            setNewTitle={setNewTitle}
-            setNewAuthor={setNewAuthor}
-            setNewUrl={setNewUrl}
+            createBlog={addBlog}
           />
         </Togglable>
       </div>
@@ -182,7 +160,7 @@ const App = () => {
             <Blog
               key={blog.id}
               blog={blog}
-              currUser={user}
+              currUsername={user.username}
               handleLike={handleLike}
               removeBlog={removeBlog}
             />

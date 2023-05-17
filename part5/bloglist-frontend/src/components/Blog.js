@@ -1,11 +1,11 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, currUser, handleLike, removeBlog }) => {
+const Blog = ({ blog, currUsername, handleLike, removeBlog }) => {
   const [moreInfo, setMoreInfo] = useState(false)
   const hideInfoWhenVisible = { display: moreInfo ? 'none' : '' }
   const showInfoWhenVisible = { display: moreInfo ? '' : 'none' }
 
-  const showToAddedUser = { display: (currUser.username === blog.user.username) ? '' : 'none' }
+  const showToAddedUser = { display: (currUsername === blog.user.username) ? '' : 'none' }
 
   const toggleInfo = () => {
     setMoreInfo(!moreInfo)
@@ -22,14 +22,14 @@ const Blog = ({ blog, currUser, handleLike, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle}>
-      <div style={hideInfoWhenVisible}>
-        {blog.title} {blog.author} <button onClick={toggleInfo}>View</button>
+    <div style={blogStyle} className='allInfo'>
+      <div style={hideInfoWhenVisible} className='lessInfo'>
+        {blog.title} {blog.author} <button onClick={toggleInfo} className='toggleInfo'>View</button>
       </div>
-      <div style={showInfoWhenVisible}>
+      <div style={showInfoWhenVisible} className='moreInfo'>
         <p>{blog.title} {blog.author} <button onClick={toggleInfo}>Hide</button></p>
-        <p>{blog.url}</p>
-        <p>{`Likes: ${blog.likes}`} <button onClick={() => handleLike(blog)}>Like</button></p>
+        <p className='url'>{blog.url}</p>
+        <p className='likes'>{`Likes: ${blog.likes}`} <button onClick={() => handleLike(blog)}>Like</button></p>
         <p>{blog.user.name}</p>
         <button style={showToAddedUser} onClick={() => removeBlog(blog)}>Remove</button>
       </div>
