@@ -22,18 +22,22 @@ const Blog = ({ blog, currUsername, handleLike, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle} className='allInfo'>
-      <div style={hideInfoWhenVisible} className='lessInfo'>
-        {blog.title} {blog.author} <button onClick={toggleInfo} className='toggleInfo'>View</button>
-      </div>
-      <div style={showInfoWhenVisible} className='moreInfo'>
-        <p>{blog.title} {blog.author} <button onClick={toggleInfo}>Hide</button></p>
-        <p className='url'>{blog.url}</p>
-        <p className='likes'>{`Likes: ${blog.likes}`} <button onClick={() => handleLike(blog)}>Like</button></p>
-        <p>{blog.user.name}</p>
-        <button style={showToAddedUser} onClick={() => removeBlog(blog)}>Remove</button>
-      </div>
-    </div>
+    <tr style={blogStyle} className='allInfo'>
+      <td>
+        <div style={hideInfoWhenVisible} className='lessInfo'>
+          {blog.title} {blog.author} <button onClick={toggleInfo} className='toggleInfo'>View</button>
+        </div>
+      </td>
+      <td>
+        <div style={showInfoWhenVisible} className='moreInfo'>
+          <p>{blog.title} {blog.author} <button onClick={toggleInfo}>Hide</button></p>
+          <p className='url'>{blog.url}</p>
+          <p className='likes'>{`Likes: ${blog.likes}`} <button className='likeButton' onClick={() => handleLike(blog)}>Like</button></p>
+          <p>{blog.user.name}</p>
+          <button id='remove-button' style={showToAddedUser} onClick={() => removeBlog(blog)}>Remove</button>
+        </div>
+      </td>
+    </tr>
   )
 }
 

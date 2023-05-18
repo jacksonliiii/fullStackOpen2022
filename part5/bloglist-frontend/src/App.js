@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
@@ -34,7 +35,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
@@ -112,31 +113,17 @@ const App = () => {
     }
   }
 
-  const loginForm = () => (
+  const loginPage = () => (
     <div>
-      <h1>Log in to BlogList</h1>
-      <form onSubmit={handleLogin}>
-        <div>
-          Username
-          <input
-            type="text"
-            value={username}
-            name="username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-
-        <div>
-          Password
-          <input
-            type="text"
-            value={password}
-            name="password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+      <Togglable buttonLabel='Head to Login'>
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleLogin={handleLogin}
+        />
+      </Togglable>
     </div>
 
   )
@@ -146,33 +133,40 @@ const App = () => {
       <h2>My Blogs</h2>
       <div>
         <h3>{user.username} logged in</h3>
-        <button onClick={handleLogout}>Logout</button>
+        <button id='logout-button' onClick={handleLogout}>Logout</button>
         <Togglable buttonLabel='Add a new Blog' ref={blogFormRef}>
           <BlogForm
             createBlog={addBlog}
           />
         </Togglable>
       </div>
-      {
-        blogs
-          .sort((blogA, blogB) => blogB.likes - blogA.likes)
-          .map(blog =>
-            <Blog
-              key={blog.id}
-              blog={blog}
-              currUsername={user.username}
-              handleLike={handleLike}
-              removeBlog={removeBlog}
-            />
-          )
-      }
+      <div className='allBlogs'>
+        <table>
+          <tbody>
+          {
+          blogs
+            .sort((blogA, blogB) => blogB.likes - blogA.likes)
+            .map(blog =>
+              <Blog
+                key={blog.id}
+                blog={blog}
+                currUsername={user.username}
+                handleLike={handleLike}
+                removeBlog={removeBlog}
+              />
+            )
+        }
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 
   return (
     <div>
+      <h1>BlogList</h1>
       <Notification info={info} />
-      {user === null && loginForm()}
+      {user === null && loginPage()}
       {user !== null && blogPage()}
     </div>
   )
