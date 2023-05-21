@@ -2,28 +2,48 @@
   "anecdotes": [
     {
       "content": "If it hurts, do it more often",
-      "votes": 5,
-      "id": 1
+      "id": 1,
+      "votes": 27
     },
     {
       "content": "Adding manpower to a late software project makes it later!",
-      "votes": 4,
-      "id": 2
+      "id": 2,
+      "votes": 7
     },
     {
       "content": "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
-      "votes": 3,
-      "id": 3
+      "id": 3,
+      "votes": 5
     },
     {
       "content": "Premature optimization is the root of all evil.",
-      "votes": 2,
-      "id": 4
+      "id": 4,
+      "votes": 6
     },
     {
       "content": "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
-      "votes": 1,
-      "id": 5
+      "id": 5,
+      "votes": 6
+    },
+    {
+      "content": "Your mom",
+      "id": "46799",
+      "votes": 3
+    },
+    {
+      "content": "'op'op'po",
+      "id": "30094",
+      "votes": 6
+    },
+    {
+      "content": "fdsfsdfds",
+      "id": "3632",
+      "votes": 3
+    },
+    {
+      "content": "fd",
+      "id": "27596",
+      "votes": 3
     }
   ]
 }
