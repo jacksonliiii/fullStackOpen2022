@@ -9,16 +9,10 @@ const AnecdoteForm = () => {
   const newAnecdoteMutation = useMutation(createAnecdote, {
     onSuccess: (data) => {
       queryClient.invalidateQueries('anecdotes')
-      dispatch({
-        type: 'CREATE',
-        payload: data.content
-      })
-      setTimeout(() => {
-        dispatch({ type: 'REMOVE' })
-      }, 2000)
+      dispatch(`You created '${data.content}'`)
     },
     onError: (error) => {
-      dispatch({type: 'LENGTH_ERROR'})
+      dispatch("Anecdote must be at least 5 characters or more")
     }
   })
 
