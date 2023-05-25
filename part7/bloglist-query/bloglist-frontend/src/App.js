@@ -7,18 +7,24 @@ import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
+import { useNotificationDispatch } from "./components/NotificationContext";
+
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+  const dispatch = useNotificationDispatch()
 
   const [info, setInfo] = useState({ message: null });
 
   const blogFormRef = useRef();
 
   const notifyWith = (message, type = "info") => {
+
+    // dispatch({})
+    
     setInfo({
       message,
       type,
