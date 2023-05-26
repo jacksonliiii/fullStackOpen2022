@@ -13,6 +13,7 @@ blogsRouter.get("/", async (request, response) => {
     username: 1,
     name: 1,
     id: 1,
+    comments: 1
   });
 
   return response.json(blogs);
@@ -28,7 +29,7 @@ blogsRouter.get("/:id", async (request, response) => {
 });
 
 blogsRouter.post("/", userExtractor, async (request, response) => {
-  const { title, author, url, likes } = request.body;
+  const { title, author, url } = request.body;
   const user = request.user;
 
   if (!user) {
@@ -39,8 +40,9 @@ blogsRouter.post("/", userExtractor, async (request, response) => {
     title,
     author,
     url,
-    likes: likes ? likes : 0,
+    likes: 0,
     user: user.id,
+    comments: []
   });
 
   const createdBlog = await blog.save();
@@ -51,8 +53,26 @@ blogsRouter.post("/", userExtractor, async (request, response) => {
   response.status(201).json(createdBlog);
 });
 
+blogsRouter.post("/:id/comments", async (request, response, next) => {
+  const commentText = request.body.comment;
+  const blogId = request.params.id;
+
+  try {
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return response.status(404).json({ error: "Blog not found" });
+    }
+
+    blog.comments.push(commentText);
+    const updatedBlog = await blog.save();
+    response.json(updatedBlog);
+  } catch (error) {
+    next(error);
+  }
+});
+
 blogsRouter.put("/:id", (request, response, next) => {
-  const { title, author, url, likes, user } = request.body;
+  const { title, author, url, likes, user, comments } = request.body;
 
   const blog = {
     title,
@@ -60,6 +80,7 @@ blogsRouter.put("/:id", (request, response, next) => {
     url,
     user: user.id,
     likes,
+    comments
   };
 
   Blog.findByIdAndUpdate(request.params.id, blog, { new: true })

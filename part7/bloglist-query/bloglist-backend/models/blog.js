@@ -15,6 +15,9 @@ const schema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  comments: {
+    type: Array
+  }
 });
 
 schema.set("toJSON", {

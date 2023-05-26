@@ -1,16 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useUserValue } from "./UserContext";
+import { Table, Form, Button } from "react-bootstrap";
 
-const Blog = ({ blog, currUsername, handleLike, removeBlog }) => {
-  const [moreInfo, setMoreInfo] = useState(false);
-  const hideInfoWhenVisible = { display: moreInfo ? "none" : "" };
-  const showInfoWhenVisible = { display: moreInfo ? "" : "none" };
+const Blog = ({ blogs, handleLike, handleComment, removeBlog }) => {
+  const [newComment, setNewComment] = useState("");
+  const [blog, setBlog] = useState(null);
+  const id = useParams().id;
 
-  const showToAddedUser = {
-    display: currUsername === blog.user.username ? "" : "none",
+  useEffect(() => {
+    const fetchBlog = () => {
+      try {
+        const allBlogs = blogs;
+        const foundBlog = allBlogs.find((b) => b.id === id);
+        setBlog(foundBlog);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchBlog();
+  }, [handleLike, handleComment]);
+  if (!blog) {
+    return <div>Loading blog...</div>;
+  }
+
+  const addComment = (event) => {
+    event.preventDefault();
+    handleComment(newComment, id);
+    setNewComment("");
   };
 
-  const toggleInfo = () => {
-    setMoreInfo(!moreInfo);
+  const showToAddedUser = {
+    display: useUserValue.username === blog.user.username ? "" : "none",
   };
 
   const blogStyle = {
@@ -24,39 +46,53 @@ const Blog = ({ blog, currUsername, handleLike, removeBlog }) => {
   };
 
   return (
-    <tr style={blogStyle} className="allInfo">
-      <td>
-        <div style={hideInfoWhenVisible} className="lessInfo">
-          {blog.title} {blog.author}{" "}
-          <button onClick={toggleInfo} className="toggleInfo">
-            View
-          </button>
-        </div>
-      </td>
-      <td>
-        <div style={showInfoWhenVisible} className="moreInfo">
-          <p>
-            {blog.title} {blog.author}{" "}
-            <button onClick={toggleInfo}>Hide</button>
-          </p>
-          <p className="url">{blog.url}</p>
-          <p className="likes">
-            {`Likes: ${blog.likes}`}{" "}
-            <button className="likeButton" onClick={() => handleLike(blog)}>
-              Like
-            </button>
-          </p>
-          <p>{blog.user.name}</p>
-          <button
-            id="remove-button"
-            style={showToAddedUser}
-            onClick={() => removeBlog(blog)}
-          >
-            Remove
-          </button>
-        </div>
-      </td>
-    </tr>
+    <Table striped>
+      <tbody>
+        <tr style={blogStyle}>
+          <td>
+            <div>
+              <h1>
+                {blog.title} {blog.author}
+              </h1>
+              <a href={blog.url} className="url">
+                {blog.url}
+              </a>
+              <p className="likes">
+                {`Likes: ${blog.likes}`}{" "}
+                <button className="likeButton" onClick={() => handleLike(blog)}>
+                  Like
+                </button>
+              </p>
+              <p>Added by {blog.user.name}</p>
+              <button
+                id="remove-button"
+                style={showToAddedUser}
+                onClick={() => removeBlog(blog)}
+              >
+                Remove
+              </button>
+
+              <h1>Comments</h1>
+              <form onSubmit={addComment}>
+                <input
+                  value={newComment}
+                  onChange={({ target }) => setNewComment(target.value)}
+                  placeholder="Leave a comment..."
+                />
+                <button type="submit">Add Comment</button>
+              </form>
+              <div>
+                <ul>
+                  {blog.comments.map((comment) => {
+                    return <li key={comment}>{comment}</li>;
+                  })}
+                </ul>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </Table>
   );
 };
 

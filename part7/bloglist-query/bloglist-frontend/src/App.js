@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useQuery, useQueryClient } from "react-query";
+import { Route, Routes, Link, useNavigate, useParams } from "react-router-dom";
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
@@ -6,55 +8,55 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import { getUsers } from "./services/users";
 
 import { useNotificationDispatch } from "./components/NotificationContext";
+import { useUserValue, useUserDispatch } from "./components/UserContext";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const blogResult = useQuery("blogs", blogService.getAll, { retry: 3 });
+
+  const [users, setUsers] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
 
-  const dispatch = useNotificationDispatch()
-
-  const [info, setInfo] = useState({ message: null });
-
+  const queryClient = useQueryClient();
+  const userValue = useUserValue();
+  const userDispatch = useUserDispatch();
+  const notificationDispatch = useNotificationDispatch();
   const blogFormRef = useRef();
-
-  const notifyWith = (message, type = "info") => {
-
-    // dispatch({})
-    
-    setInfo({
-      message,
-      type,
-    });
-
-    setTimeout(() => {
-      setInfo({ message: null });
-    }, 3000);
-  };
-
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      userDispatch(user);
       blogService.setToken(user.token);
     }
   }, []);
 
+  useEffect(() => {
+    getUsers().then((returnedUsers) => {
+      setUsers(returnedUsers);
+    });
+  }, []);
+
+  if (blogResult.isLoading) {
+    return <div>Loading blogs...</div>;
+  }
+  if (blogResult.isError) {
+    return <div>Blog service not available due to problems in server!</div>;
+  }
+  const blogs = blogResult.data;
+
   const addBlog = (blogObject) => {
     blogService.create(blogObject).then((createdBlog) => {
       blogFormRef.current.toggleVisibility();
-      notifyWith(
-        `A new blog '${createdBlog.title}' by ${createdBlog.author} was added.`
-      );
-      setBlogs(blogs.concat(createdBlog));
+      notificationDispatch({
+        message: `A new blog '${createdBlog.title}' by ${createdBlog.author} was added.`,
+        type: "info",
+      });
+      queryClient.invalidateQueries("blogs");
     });
   };
 
@@ -62,12 +64,18 @@ const App = () => {
     if (window.confirm(`Do you want to remove blog ${blog.title}?`)) {
       blogService
         .remove(blog.id)
-        .then((response) => {
-          notifyWith(`Blog '${response.title}' was removed.`);
-          setBlogs(blogs.filter((currBlog) => currBlog.id !== blog.id));
+        .then(() => {
+          notificationDispatch({
+            message: `Blog '${blog.title}' was removed.`,
+            type: "info",
+          });
+          queryClient.invalidateQueries("blogs");
         })
         .catch((error) => {
-          notifyWith(`${error}`, "error");
+          notificationDispatch({
+            message: `${error}`,
+            type: "error",
+          });
         });
     }
   };
@@ -76,13 +84,24 @@ const App = () => {
     try {
       const updatedBlog = { ...blog, likes: blog.likes + 1 };
       await blogService.update(blog.id, updatedBlog);
-      setBlogs(
-        blogs.map((currBlog) =>
-          currBlog.id === blog.id ? updatedBlog : currBlog
-        )
-      );
+      queryClient.invalidateQueries("blogs");
     } catch (error) {
-      notifyWith(`${error}`, "error");
+      notificationDispatch({
+        message: `${error}`,
+        type: "error",
+      });
+    }
+  };
+
+  const handleComment = async (comment, id) => {
+    try {
+      await blogService.postComment(comment, id);
+      queryClient.invalidateQueries("blogs");
+    } catch (error) {
+      notificationDispatch({
+        message: `${error}`,
+        type: "error",
+      });
     }
   };
 
@@ -98,12 +117,14 @@ const App = () => {
       window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
 
       blogService.setToken(user.token);
-      setUser(user);
+      userDispatch(user);
       setUsername("");
       setPassword("");
     } catch (exception) {
-      notifyWith("Wrong username or password", "error");
-      setTimeout(() => {}, 5000);
+      notificationDispatch({
+        message: "Wrong username or password",
+        type: "error",
+      });
     }
   };
 
@@ -113,9 +134,12 @@ const App = () => {
     try {
       window.localStorage.removeItem("loggedBlogAppUser");
       blogService.setToken("");
-      setUser(null);
+      userDispatch(null);
     } catch (exception) {
-      setTimeout(() => {}, 5000);
+      notificationDispatch({
+        message: exception,
+        type: "error",
+      });
     }
   };
 
@@ -137,10 +161,12 @@ const App = () => {
     <div>
       <h2>My Blogs</h2>
       <div>
-        <h3>{user.username} logged in</h3>
+        <h3>{userValue.username} logged in</h3>
         <button id="logout-button" onClick={handleLogout}>
           Logout
         </button>
+      </div>
+      <div>
         <Togglable buttonLabel="Add a new Blog" ref={blogFormRef}>
           <BlogForm createBlog={addBlog} />
         </Togglable>
@@ -151,13 +177,13 @@ const App = () => {
             {blogs
               .sort((blogA, blogB) => blogB.likes - blogA.likes)
               .map((blog) => (
-                <Blog
-                  key={blog.id}
-                  blog={blog}
-                  currUsername={user.username}
-                  handleLike={handleLike}
-                  removeBlog={removeBlog}
-                />
+                <tr key={blog.id}>
+                  <td>
+                    <Link key={blog.id} to={`/blogs/${blog.id}`}>
+                      {blog.title} {blog.author}
+                    </Link>
+                  </td>
+                </tr>
               ))}
           </tbody>
         </table>
@@ -165,12 +191,109 @@ const App = () => {
     </div>
   );
 
-  return (
+  const Menu = () => {
+    const padding = {
+      paddingRight: 10,
+    };
+    const menuStyle = {
+      margin: 20,
+    };
+    return (
+      <div style={menuStyle}>
+        <Link to="/" style={padding}>
+          Blogs
+        </Link>
+        <Link to="/users" style={padding}>
+          Users
+        </Link>
+      </div>
+    );
+  };
+
+  const Users = () => (
     <div>
-      <h1>BlogList</h1>
-      <Notification info={info} />
-      {user === null && loginPage()}
-      {user !== null && blogPage()}
+      <h1>Users Data</h1>
+      <table>
+        <tbody>
+          <tr>
+            <th>Users</th>
+            <th>Blogs Created</th>
+          </tr>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
+              <td>{user.blogs.length}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const User = () => {
+    const [user, setUser] = useState(null);
+    const id = useParams().id;
+
+    useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const users = await getUsers();
+          const foundUser = users.find((user) => user.id === id);
+          setUser(foundUser);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      fetchUser();
+    }, []);
+    if (!user) {
+      return <div>Loading user...</div>;
+    }
+    return (
+      <div>
+        <h1>{user.name}</h1>
+        <h2>Added Blogs</h2>
+        <ul>
+          {user.blogs.map((blog) => {
+            return <li key={blog.id}>{blog.title}</li>;
+          })}
+        </ul>
+      </div>
+    );
+  };
+
+  return (
+    <div className="container">
+      <Menu />
+      <h1>BlogList App</h1>
+      <Notification />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div>
+              {userValue === null && loginPage()}
+              {userValue !== null && blogPage()}
+            </div>
+          }
+        />
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<User />} />
+        <Route
+          path="/blogs/:id"
+          element={
+            <Blog
+              blogs={blogs}
+              handleLike={handleLike}
+              handleComment={handleComment}
+              remove={removeBlog}
+            />
+          }
+        />
+      </Routes>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { useNotificationValue } from "./NotificationContext";
 
-const Notification = ({info}) => {
-  // const info = useNotificationValue();
+const Notification = () => {
+  const info = useNotificationValue();
 
   if (!info.message) {
     return;
