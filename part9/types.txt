@@ -1,0 +1,12 @@
+# GLOBAL INSTALL
+npm install -g ts-node typescript
+
+# DEPENDENCY INSTALL
+npm install --save-dev ts-node typescript
+
+# SCRIPT SETUP
+"scripts": {
+    "ts-node": "ts-node"
+}
+
+npm install --save-dev @types/react @types/express @types/lodash @types/jest @types/mongoose

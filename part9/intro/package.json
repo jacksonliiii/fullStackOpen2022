@@ -8,5 +8,8 @@
     "ts-node": "ts-node"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.2.5"
+  }
 }
