@@ -1,0 +1,8 @@
+cd usr
+cd src
+d app
+ls
+ano index.js
+console.log('Hello World')
+Ctrl+X
+Y
