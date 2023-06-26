@@ -1,48 +1,5 @@
-interface HeaderProps {
-  name: string;
-}
-
-interface PartProps {
-  part: CoursePart;
-}
-
-interface CoursePartsProps {
-  contents: CoursePart[];
-}
-
-interface CoursePartBase {
-  name: string;
-  exerciseCount: number;
-}
-
-interface CoursePartDescription extends CoursePartBase {
-  description: string;
-}
-
-interface CoursePartBasic extends CoursePartDescription {
-  kind: "basic";
-}
-
-interface CoursePartGroup extends CoursePartBase {
-  groupProjectCount: number;
-  kind: "group";
-}
-
-interface CoursePartBackground extends CoursePartDescription {
-  backgroundMaterial: string;
-  kind: "background";
-}
-
-interface CoursePartRequirements extends CoursePartDescription {
-  requirements: string[];
-  kind: "special";
-}
-
-type CoursePart =
-  | CoursePartBasic
-  | CoursePartGroup
-  | CoursePartBackground
-  | CoursePartRequirements;
+import { CoursePart, HeaderProps, PartProps, CoursePartsProps } from "./types";
+import { assertNever } from "./utils";
 
 const courseParts: CoursePart[] = [
   {
@@ -85,12 +42,6 @@ const courseParts: CoursePart[] = [
     kind: "special",
   },
 ];
-
-const assertNever = (value: never): never => {
-  throw new Error(
-    `Unhandled discriminated union member: ${JSON.stringify(value)}`
-  );
-};
 
 const Header = (props: HeaderProps) => {
   return (
