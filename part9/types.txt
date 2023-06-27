@@ -8,5 +8,3 @@ npm install --save-dev ts-node typescript
 "scripts": {
     "ts-node": "ts-node"
 }
-
-npm install --save-dev @types/react @types/express @types/lodash @types/jest @types/mongoose
