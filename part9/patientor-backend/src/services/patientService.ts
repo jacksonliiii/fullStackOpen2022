@@ -21,6 +21,14 @@ const getNonSensitiveEntries = (): NonSensitivePatientEntry[] => {
   }));
 };
 
+const getPatient = (id: string): PatientEntry => {
+  const found = patients.find((patient) => patient.id === id);
+  if (found) {
+    return found;
+  }
+  throw new TypeError();
+};
+
 const addPatient = (entry: NewPatientEntry): PatientEntry => {
   const newPatientEntry = {
     id: uuidv4(),
@@ -34,6 +42,7 @@ const addPatient = (entry: NewPatientEntry): PatientEntry => {
 const patientService = {
   getEntries,
   getNonSensitiveEntries,
+  getPatient,
   addPatient,
 };
 

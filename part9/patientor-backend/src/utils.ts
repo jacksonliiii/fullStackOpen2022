@@ -1,4 +1,4 @@
-import { NewPatientEntry, Gender } from "./types";
+import { Entry, NewPatientEntry, Gender } from "./types";
 
 /*
  *----- TYPE PREDICATE ------
@@ -21,7 +21,7 @@ const isGender = (param: string): param is Gender => {
  *----- TYPE PARSING ------
  */
 const parseName = (name: unknown): string => {
-  if (!name ||!isString(name)) {
+  if (!name || !isString(name)) {
     throw new Error("Incorrect or missing name");
   }
 
@@ -58,6 +58,14 @@ const parseOccupation = (occupation: unknown): string => {
   return occupation;
 };
 
+const parseEntries = (entries: unknown): Entry[] => {
+  if (!entries || !Array.isArray(entries)) {
+    throw new Error("Incorrect or missing occupation");
+  }
+
+  return entries as Entry[];
+};
+
 const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   if (!object || typeof object !== "object") {
     throw new Error("Incorrect or missing data");
@@ -68,7 +76,8 @@ const toNewPatientEntry = (object: unknown): NewPatientEntry => {
     "dateOfBirth" in object &&
     "ssn" in object &&
     "gender" in object &&
-    "occupation" in object
+    "occupation" in object &&
+    "entries" in object
   ) {
     const newEntry: NewPatientEntry = {
       name: parseName(object.name),
@@ -76,6 +85,7 @@ const toNewPatientEntry = (object: unknown): NewPatientEntry => {
       ssn: parseSSN(object.ssn),
       gender: parseGender(object.gender),
       occupation: parseOccupation(object.occupation),
+      entries: parseEntries(object.entries),
     };
     return newEntry;
   }
